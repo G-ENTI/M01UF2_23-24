@@ -25,7 +25,7 @@ echo "OK_HEADER" | nc localhost 3333
 echo "(4. LISTEN)"
 # Almacenamos la escucha del servidor dentro de la variable "DATA"
 DATA=` nc -l -p 3333 -w 0 `
-
+sleep 1
 # Comprobamos que el HANDSHAKE es correcto
 echo "(7.) TEST & SEND"
 # En caso de no ser, muestra un mensaje de error y sale con codigo 2
@@ -35,11 +35,20 @@ then
 	echo "KO_HANDSHAKE" | nc localhost 3333
 	exit 2
 fi
-echo "HANDSHAKE CORRECT, SENDING BACK..."
-sleep 1
-echo "BOOOM" | nc localhost 3333 
+echo "OK_HANDSHAKE" | nc localhost 3333
+echo "(8).Listen"
+DATA=` nc -l -p 3333 -w 0 `
+echo "(12).TEST & STORE & SEND"
+PREFIX=`echo $DATA | cut -d " " -f 1`
+if [ "$PREFIX" != "FILE_NAME" ]
+then
+	echo "ERROR 3: BAD FILENAME PREFIX"
+	sleep 1
+	echo "KO_FILE_NAME" | nc localhost 3333
+	exit 3
+fi
 
-
+FILE_NAME=` echo $DATA | cut -d " " -f 2 `
 
 
 
